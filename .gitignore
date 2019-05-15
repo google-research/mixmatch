@@ -1,0 +1,6 @@
+*.iml
+*.pyc
+.idea
+3rdparty/
+experiments/
+gpumux/

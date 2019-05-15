@@ -1,0 +1,6 @@
+absl-py
+easydict
+cython
+numpy
+tensorflow-gpu
+tqdm
