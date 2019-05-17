@@ -14,4 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-echo "python privacy/pr_mixmatch.py --train_dir experiments/privacy --dataset=svhn200.0@138-1 --beta=0.75 --w_match=75"
+for run in 0 1 2 3 4 5 6 7 8 9; do
+echo "python privacy/pr_mixmatch.py --train_dir experiments/privacy/run${run} --dataset=svhn200.0@138-1 --beta=0.75 --w_match=75"
+done

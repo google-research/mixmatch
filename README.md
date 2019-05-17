@@ -117,11 +117,11 @@ We compute the median accuracy of the last 20 checkpoints in the paper, this is 
 # The format is JSON so you can either see its content as a text file or process it to your liking.
 ```
 
-# Reproducing tables from the paper
+## Reproducing tables from the paper
 
 Check the contents of the `runs/*.sh` files, these will give you the commands (and the hyper-parameters) to reproduce the results from the paper.
 
-# Citing this work
+## Citing this work
 
 ```
 @article{berthelot2019mixmatch,
