@@ -64,6 +64,16 @@ done; wait
 
 ## Running
 
+### Setup
+
+All commands must be ran from the project root. The following environment variables must be defined:
+```bash
+export ML_DATA="path to where you want the datasets saved"
+export PYTHONPATH=$PYTHONPATH:.
+```
+
+### Example
+
 For example, training a mixmatch with 32 filters on cifar10 shuffled with `seed=3`, 250 labeled samples and 5000
 validation samples:
 ```bash
