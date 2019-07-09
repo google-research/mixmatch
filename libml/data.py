@@ -18,10 +18,9 @@ import glob
 import itertools
 import os
 
-from absl import flags
-
 import numpy as np
 import tensorflow as tf
+from absl import flags
 from tqdm import tqdm
 
 from libml import utils
@@ -62,7 +61,7 @@ def dataset(filenames: list) -> tf.data.Dataset:
 
 def memoize(dataset: tf.data.Dataset) -> tf.data.Dataset:
     data = []
-    with tf.Graph().as_default(), tf.Session(config=utils.get_config()) as session:
+    with tf.Session(config=utils.get_config()) as session:
         dataset = dataset.prefetch(16)
         it = dataset.make_one_shot_iterator().get_next()
         try:
