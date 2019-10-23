@@ -15,10 +15,48 @@
 
 import functools
 import itertools
+
+import tensorflow as tf
 from absl import flags
+
 from libml import layers
 from libml.train import ClassifySemi
-import tensorflow as tf
+
+
+class CNN13(ClassifySemi):
+    """Simplified reproduction of the Mean Teacher paper network. filters=128 in original implementation.
+    Removed dropout, Gaussians, forked dense layers, basically all non-standard things."""
+
+    def classifier(self, x, scales, filters, training, getter=None, **kwargs):
+        del kwargs
+        assert scales == 3  # Only specified for 32x32 inputs.
+        conv_args = dict(kernel_size=3, activation=tf.nn.leaky_relu, padding='same')
+        bn_args = dict(training=training, momentum=0.999)
+
+        with tf.variable_scope('classify', reuse=tf.AUTO_REUSE, custom_getter=getter):
+            y = tf.layers.conv2d(x, filters, **conv_args)
+            y = tf.layers.batch_normalization(y, **bn_args)
+            y = tf.layers.conv2d(y, filters, **conv_args)
+            y = tf.layers.batch_normalization(y, **bn_args)
+            y = tf.layers.conv2d(y, filters, **conv_args)
+            y = tf.layers.batch_normalization(y, **bn_args)
+            y = tf.layers.max_pooling2d(y, 2, 2)
+            y = tf.layers.conv2d(y, 2 * filters, **conv_args)
+            y = tf.layers.batch_normalization(y, **bn_args)
+            y = tf.layers.conv2d(y, 2 * filters, **conv_args)
+            y = tf.layers.batch_normalization(y, **bn_args)
+            y = tf.layers.conv2d(y, 2 * filters, **conv_args)
+            y = tf.layers.batch_normalization(y, **bn_args)
+            y = tf.layers.max_pooling2d(y, 2, 2)
+            y = tf.layers.conv2d(y, 4 * filters, kernel_size=3, activation=tf.nn.leaky_relu, padding='valid')
+            y = tf.layers.batch_normalization(y, **bn_args)
+            y = tf.layers.conv2d(y, 2 * filters, kernel_size=1, activation=tf.nn.leaky_relu, padding='same')
+            y = tf.layers.batch_normalization(y, **bn_args)
+            y = tf.layers.conv2d(y, 1 * filters, kernel_size=1, activation=tf.nn.leaky_relu, padding='same')
+            y = tf.layers.batch_normalization(y, **bn_args)
+            y = tf.reduce_mean(y, [1, 2])  # (b, 6, 6, 128) -> (b, 128)
+            logits = tf.layers.dense(y, self.nclass)
+        return logits
 
 
 class ConvNet(ClassifySemi):
@@ -119,16 +157,18 @@ class ShakeNet(ClassifySemi):
         return logits
 
 
-class MultiModel(ConvNet, ResNet, ShakeNet):
-    MODEL_CONVNET, MODEL_RESNET, MODEL_SHAKE = 'convnet resnet shake'.split()
-    MODELS = MODEL_CONVNET, MODEL_RESNET, MODEL_SHAKE
+class MultiModel(CNN13, ConvNet, ResNet, ShakeNet):
+    MODEL_CNN13, MODEL_CONVNET, MODEL_RESNET, MODEL_SHAKE = 'cnn13 convnet resnet shake'.split()
+    MODELS = MODEL_CNN13, MODEL_CONVNET, MODEL_RESNET, MODEL_SHAKE
 
     def augment(self, x, l, smoothing, **kwargs):
         del kwargs
         return x, l - smoothing * (l - 1. / self.nclass)
 
     def classifier(self, x, arch, **kwargs):
-        if arch == self.MODEL_CONVNET:
+        if arch == self.MODEL_CNN13:
+            return CNN13.classifier(self, x, **kwargs)
+        elif arch == self.MODEL_CONVNET:
             return ConvNet.classifier(self, x, **kwargs)
         elif arch == self.MODEL_RESNET:
             return ResNet.classifier(self, x, **kwargs)
