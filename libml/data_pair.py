@@ -43,7 +43,7 @@ DATASETS.update(
 DATASETS.update([DataSet.creator('stl10', seed, label, valid, [augment_stl10, stack_augment(augment_stl10)], height=96,
                                  width=96, do_memoize=False)
                  for seed, label, valid in
-                 itertools.product(range(6), [1000, 5000], [1, 500])])
+                 itertools.product(range(6), [1000, 5000], [1, 5000])])
 DATASETS.update([DataSet.creator('svhn', seed, label, valid, [augment_svhn, stack_augment(augment_svhn)],
                                  do_memoize=False)
                  for seed, label, valid in
