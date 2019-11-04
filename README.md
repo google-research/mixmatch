@@ -81,7 +81,7 @@ CUDA_VISIBLE_DEVICES=0 python mixmatch.py --filters=32 --dataset=cifar10.3@250-5
 ```
 
 Available labelled sizes are 250, 500, 1000, 2000, 4000.
-For validation, available sizes are 1, 5000.
+For validation, available sizes are 1, 5000 (and 500 for STL10).
 Possible shuffling seeds are 1, 2, 3, 4, 5 and 0 for no shuffling (0 is not used in practiced since data requires to be
 shuffled for gradient descent to work properly).
 
@@ -100,7 +100,7 @@ for valid in 1 5000; do
 done; done
 
 for seed in 1 2 3 4 5; do
-for valid in 1 5000; do
+for valid in 1 500; do
     echo "stl10.${seed}@1000-${valid}"
 done; done
 echo "stl10.1@5000-1"
